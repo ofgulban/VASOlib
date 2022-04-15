@@ -1,4 +1,4 @@
-"""Simulate signal from Huber2017."""
+"""Interactive VASO simulations."""
 
 import numpy as np
 import matplotlib.pyplot as plt
