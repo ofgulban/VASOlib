@@ -41,7 +41,7 @@ def update(val):
 # =============================================================================
 # Initial parameters
 # NOTE: T1_Blood = 2122. T1_GM = 1700, T1_CSF = 5500.
-FA_deg = np.linspace(0, 60, 101)  # ms
+FA_deg = np.linspace(0, 60, 101)
 FA_rad = np.deg2rad(FA_deg)
 
 T1_Blood = 2122
