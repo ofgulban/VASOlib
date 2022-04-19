@@ -40,7 +40,7 @@ def stage6(time, T1, Ti):
 # Initial parameters
 T1csf = 5.
 T1gm = 1.9
-T1b = 2.1
+T1b = 2.1  # steady state blood
 Tr = 2.
 T1 = T1b  # für Tr= 3
 Ti = (np.log(2) - np.log(1 + np.exp(-2 * Tr / T1))) * T1
@@ -74,5 +74,6 @@ plt.xlabel("Time [s]")
 plt.ylabel(r"$M_z$")
 plt.ylim([-1, 1])
 plt.grid(True)
+plt.legend(["Steady-state blood", "Gray matter"])
 
 plt.show()
