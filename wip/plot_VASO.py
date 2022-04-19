@@ -68,4 +68,11 @@ signal2[time < Ti] = stage1(time[time < Ti], T1gm)
 
 plt.plot(time, signal1)
 plt.plot(time, signal2)
+
+plt.title("Original VASO")
+plt.xlabel("Time [s]")
+plt.ylabel(r"$M_z$")
+plt.ylim([-1, 1])
+plt.grid(True)
+
 plt.show()
