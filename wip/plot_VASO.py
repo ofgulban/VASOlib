@@ -127,7 +127,7 @@ for i, t in enumerate(time):
     # -------------------------------------------------------------------------
     # 180 degree pulse
     # -------------------------------------------------------------------------
-    elif t < Ti:
+    elif cond[i] == 1:
         if cond[i] != cond[i-1]:  # Update M0 upon condition switch
             M0_init = Mz(time=Tr+Tr-Ti, M0_equi=M0_equi, M0_init=M0_init,
                          FA_rad=np.deg2rad(90), T1=T1gm)
