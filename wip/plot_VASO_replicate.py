@@ -56,9 +56,11 @@ def stage3_blood(time, T1, Ti):
     """Compute Mz for condition: time < Tr+Tr+Tr+Tr."""
     return 1 - np.exp((-(time-2*Tr))/T1) * (1 + (1 - np.exp((-(Tr+Tr)+Ti) / T1)))
 
+
 def stage4_blood(time, T1, Ti):
     """Compute Mz for condition: time < Tr+Tr+Tr+Tr+Tr+Tr."""
-    return 1 - np.exp((-(time-4*Tr)) / T1) * (1 + 1 - np.exp((-(Tr+Tr+Tr+Tr-2*Tr)) / T1) * (1 + (1 -2 * np.exp(-(Tr+Tr)/T1))))
+    return 1 - np.exp((-(time-4*Tr)) / T1) * (1 + 1 - np.exp((-(Tr+Tr+Tr+Tr-2*Tr)) / T1) * (1 + (1 - 2 * np.exp(-(Tr+Tr)/T1))))
+
 
 # =============================================================================
 # Initial parameters (direct translation of gnuplot conditions)
