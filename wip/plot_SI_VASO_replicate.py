@@ -31,6 +31,7 @@ def stage5_gm(time, T1, Ti):
     """Compute Mz for condition: time < Tr+Tr+Ti+Tr+Tr."""
     return 1 - np.exp((-time+Tr+Tr+Tr+Tr) / T1) * (1 - np.exp((-Tr) / T1) + 1)
 
+
 def stage6_gm(time, T1, Ti):
     """Compute Mz for condition: time < Tr+Tr+Tr+Tr+Tr+Tr."""
     return 1 - np.exp((-time+Ti+Tr+Tr+Tr+Tr) / T1)
@@ -39,8 +40,6 @@ def stage6_gm(time, T1, Ti):
 # =============================================================================
 # Blood (direct translation of gnuplot conditions)
 # =============================================================================
-# NOTE[Faruk]: Renzo seems to skip two stages here because 90 deg pulse has no
-# effect on the longitudinal recovery as it happens on zero crossing for blood
 def stage1_blood(time, T1):
     """Compute Mz for condition: time < Ti."""
     return 1 - 2 * np.exp(-time / T1)
@@ -74,12 +73,13 @@ def stage6_blood(time, T1, Ti):
 # =============================================================================
 # Initial parameters (direct translation of gnuplot conditions)
 # =============================================================================
-T1csf = 5.
+T1csf = 5
 T1gm = 1.9
 T1b = 2.1  # steady state blood
+
+Ti = 1.18
+Ti2 = 1.7
 Tr = 2.
-T1 = T1b  # für Tr= 3
-Ti = (np.log(2) - np.log(1 + np.exp(-2 * Tr / T1))) * T1
 
 x = 5 * Tr + 0.06
 time = np.linspace(0, x, 1001)

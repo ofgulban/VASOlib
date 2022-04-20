@@ -56,9 +56,11 @@ def stage3_blood(time, T1, Ti):
     """Compute Mz for condition: time < Tr+Tr+Tr+Tr."""
     return 1 - np.exp((-(time-2*Tr))/T1) * (1 + (1 - np.exp((-(Tr+Tr)+Ti) / T1)))
 
+
 def stage4_blood(time, T1, Ti):
     """Compute Mz for condition: time < Tr+Tr+Tr+Tr+Tr+Tr."""
-    return 1 - np.exp((-(time-4*Tr)) / T1) * (1 + 1 - np.exp((-(Tr+Tr+Tr+Tr-2*Tr)) / T1) * (1 + (1 -2 * np.exp(-(Tr+Tr)/T1))))
+    return 1 - np.exp((-(time-4*Tr)) / T1) * (1 + 1 - np.exp((-(Tr+Tr+Tr+Tr-2*Tr)) / T1) * (1 + (1 - 2 * np.exp(-(Tr+Tr) / T1))))
+
 
 # =============================================================================
 # Initial parameters (direct translation of gnuplot conditions)
@@ -91,11 +93,9 @@ signal2[time < Tr+Tr] = stage2_blood(time[time < Tr+Tr], T1b, Ti)
 signal2[time < Ti] = stage1_blood(time[time < Ti], T1b)
 
 
-
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # Faruk's rework start from here
 # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 def Mz(time, M0_equi, M0_init, FA_rad, T1):
     """Longitudinal magnetization."""
     return M0_equi - (M0_equi - M0_init * np.cos(FA_rad)) * np.exp(-time/T1)
@@ -167,7 +167,7 @@ for i, t in enumerate(time):
             M0_init = Mz(time=Tr+Tr-Ti, M0_equi=M0_equi, M0_init=M0_init,
                          FA_rad=np.deg2rad(90), T1=T1b)
         signal4[i] = Mz(time=t, M0_equi=M0_equi, M0_init=M0_init,
-                            FA_rad=np.deg2rad(180), T1=T1b)
+                        FA_rad=np.deg2rad(180), T1=T1b)
 
     # -------------------------------------------------------------------------
     # 90 degree pulse
