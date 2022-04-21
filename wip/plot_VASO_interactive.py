@@ -99,7 +99,6 @@ def update(val):
     Tr = sTr.val
 
     plot_VASO_Mz_signal(ax1, max_time, T1_ref=T1b, T1=T1, Tr=Tr, Ti=Ti)
-
     fig1.canvas.draw_idle()
 
 
