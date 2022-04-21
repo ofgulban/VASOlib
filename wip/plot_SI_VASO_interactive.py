@@ -1,11 +1,10 @@
-"""Interactive VASO longitudinal magnetization simulation.
+"""Interactive SI-VASO longitudinal magnetization simulation.
 
 Reference
 ---------
-- Renzo Huber's PhD Thesis Fig. 3.2 Panel A Page 47.
+- Renzo Huber's PhD Thesis Fig. 3.2 Panel B Page 47.
 
 """
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
@@ -19,7 +18,7 @@ def Mz(time, M0_equi, M0_init, FA_rad, T1):
     return M0_equi - (M0_equi - M0_init * np.cos(FA_rad)) * np.exp(-time/T1)
 
 
-def compute_VASO_Mz_signal(time, T1, Tr, Ti):
+def compute_SI_VASO_Mz_signal(time, T1, Tr, Ti, mode_nonblood=False):
     """Compute VASO Mz signal."""
     signal = np.zeros(time.shape)
     M0_equi = 1.  # This never changes
@@ -42,14 +41,15 @@ def compute_VASO_Mz_signal(time, T1, Tr, Ti):
         # 180 degree pulse
         # ---------------------------------------------------------------------
         elif cond[i] == 1:
-            if cond[i] != cond[i-1]:  # Update M0 upon condition switch
-                M0_init = Mz(time=Tr+Tr-Ti, M0_equi=M0_equi, M0_init=M0_init,
-                             FA_rad=np.deg2rad(90), T1=T1)
+            if mode_nonblood:
+                if cond[i] != cond[i-1]:  # Update M0 upon condition switch
+                    M0_init = Mz(time=Tr, M0_equi=M0_equi, M0_init=M0_init,
+                                 FA_rad=np.deg2rad(90), T1=T1)
             signal[i] = Mz(time=t, M0_equi=M0_equi, M0_init=M0_init,
                            FA_rad=np.deg2rad(180), T1=T1)
-        # ----------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # 90 degree pulse
-        # ----------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         else:
             signal[i] = Mz(time=t-Ti, M0_equi=M0_equi, M0_init=M0_init,
                            FA_rad=np.deg2rad(90), T1=T1)
@@ -59,14 +59,16 @@ def compute_VASO_Mz_signal(time, T1, Tr, Ti):
 def plot_VASO_Mz_signal(ax, max_time, T1_ref, T1, Tr, Ti):
     """Protocol to plot VASO longitudinal magnetization."""
     time = np.linspace(0, max_time, 1001)
-    signal1 = compute_VASO_Mz_signal(time, T1, Tr, Ti)
-    signal2 = compute_VASO_Mz_signal(time, T1_ref, Tr, Ti)
+    signal1 = compute_SI_VASO_Mz_signal(time, T1, Tr, Ti,
+                                        mode_nonblood=True)
+    signal2 = compute_SI_VASO_Mz_signal(time, T1_ref, Tr, Ti,
+                                        mode_nonblood=False)
 
     ax.cla()
     ax.plot(time, signal1, lw=2, color="blue")
     ax.plot(time, signal2, lw=2, color="red")
 
-    ax.set_title("Original VASO")
+    ax.set_title("SI-VASO")
     ax.set_xlabel("Time [s]")
     ax.set_ylabel(r"$M_z$")
     ax.set_xlim([0, max_time])
@@ -99,25 +101,24 @@ def update(val):
     Tr = sTr.val
 
     plot_VASO_Mz_signal(ax1, max_time, T1_ref=T1b, T1=T1, Tr=Tr, Ti=Ti)
-
     fig1.canvas.draw_idle()
 
 
 # =============================================================================
-# Initial parameters
+# Initial parameters (direct translation of gnuplot conditions)
 # =============================================================================
-T1csf = 5.
 T1gm = 1.9
 T1b = 2.1  # steady state blood
+Ti = 1.18
+Ti2 = 1.7
 Tr = 2.
-T1 = T1b  # für Tr= 3
-Ti = (np.log(2) - np.log(1 + np.exp(-2 * Tr / T1))) * T1
+
 max_time = 5 * Tr
+time = np.linspace(0, max_time, 1001)
 
 # =============================================================================
 # Plotting
 # =============================================================================
-# Prepare figure
 fig1, (ax1) = plt.subplots(1, 1)
 plot_VASO_Mz_signal(ax1, max_time, T1_ref=T1b, T1=T1gm, Tr=Tr, Ti=Ti)
 
