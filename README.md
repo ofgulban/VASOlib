@@ -1,5 +1,7 @@
 # VASOlib (work in progress...)
-VASO MRI pulse sequence related equations implemented for self study purposes :)
+Vascular space occupancy (VASO) magnetic resonance imaging (MRI) pulse sequence related equations implemented for self study purposes.
+
+TODO: Add an image.
 
 ## Dependencies
 | Package                                            | Tested version |
@@ -15,4 +17,4 @@ TODO: Explore the `scripts` folder for now.
 This project is licensed under [BSD-3-Clause](https://opensource.org/licenses/BSD-3-Clause).
 
 ## References
-TODO
+TODO:
