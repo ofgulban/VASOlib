@@ -1,8 +1,8 @@
-"""Interactive SI-VASO longitudinal magnetization simulation.
+"""Interactive SI-SS-VASO longitudinal magnetization simulation.
 
 Reference
 ---------
-- Renzo Huber's PhD Thesis Fig. 3.2 Panel B Page 47.
+- Renzo Huber's PhD Thesis Fig. 3.2 Panel C Page 47.
 
 """
 import numpy as np
@@ -18,17 +18,18 @@ def Mz(time, M0_equi, M0_init, FA_rad, T1):
     return M0_equi - (M0_equi - M0_init * np.cos(FA_rad)) * np.exp(-time/T1)
 
 
-def compute_SI_VASO_Mz_signal(time, T1, Tr, Ti, mode_nonblood=False):
+def compute_SI_SS_VASO_Mz_signal(time, T1, Tr, Ti1, Ti2, mode_nonblood=False):
     """Compute VASO Mz signal."""
     signal = np.zeros(time.shape)
     M0_equi = 1.  # This never changes
     M0_init = 1.
 
     # Prepare condition array
-    cond = np.full(time.shape, 2)
-    idx1 = time % (Tr*2) < Ti  # Stages after 180 deg pulse
+    cond = np.full(time.shape, 3)
+    idx2 = time % (Tr*2) < (Ti2+Tr)  # Stages after 180 deg pulse
+    idx1 = time % (Tr*2) < Ti1  # Stages after the first 90 deg pulse
+    cond[idx2] = 2
     cond[idx1] = 1
-
     for i, t in enumerate(time):
         t %= 2*Tr
         # ---------------------------------------------------------------------
@@ -38,37 +39,43 @@ def compute_SI_VASO_Mz_signal(time, T1, Tr, Ti, mode_nonblood=False):
             signal[i] = Mz(time=t, M0_equi=M0_equi, M0_init=M0_init,
                            FA_rad=np.deg2rad(180), T1=T1)
         # ---------------------------------------------------------------------
-        # 180 degree pulse
+        # After 180 degree pulse
         # ---------------------------------------------------------------------
         elif cond[i] == 1:
             if mode_nonblood:
                 if cond[i] != cond[i-1]:  # Update M0 upon condition switch
-                    M0_init = Mz(time=Tr, M0_equi=M0_equi, M0_init=M0_init,
+                    M0_init = Mz(time=Tr-Ti2, M0_equi=M0_equi, M0_init=M0_init,
                                  FA_rad=np.deg2rad(90), T1=T1)
             signal[i] = Mz(time=t, M0_equi=M0_equi, M0_init=M0_init,
                            FA_rad=np.deg2rad(180), T1=T1)
         # ---------------------------------------------------------------------
-        # 90 degree pulse
+        # After the first 90 degree pulse
+        # ---------------------------------------------------------------------
+        elif cond[i] == 2:
+            signal[i] = Mz(time=t-Ti1, M0_equi=M0_equi, M0_init=M0_init,
+                           FA_rad=np.deg2rad(90), T1=T1)
+        # ---------------------------------------------------------------------
+        # After the second 90 degree pulse
         # ---------------------------------------------------------------------
         else:
-            signal[i] = Mz(time=t-Ti, M0_equi=M0_equi, M0_init=M0_init,
+            signal[i] = Mz(time=t-Tr-Ti2, M0_equi=M0_equi, M0_init=M0_init,
                            FA_rad=np.deg2rad(90), T1=T1)
     return signal
 
 
-def plot_SI_VASO_Mz_signal(ax, max_time, T1_ref, T1, Tr, Ti):
+def plot_SI_SS_VASO_Mz_signal(ax, max_time, T1_ref, T1, Tr, Ti1, Ti2):
     """Protocol to plot VASO longitudinal magnetization."""
     time = np.linspace(0, max_time, 1001)
-    signal1 = compute_SI_VASO_Mz_signal(time, T1, Tr, Ti,
-                                        mode_nonblood=True)
-    signal2 = compute_SI_VASO_Mz_signal(time, T1_ref, Tr, Ti,
-                                        mode_nonblood=False)
+    signal1 = compute_SI_SS_VASO_Mz_signal(time, T1, Tr, Ti1, Ti2,
+                                           mode_nonblood=True)
+    signal2 = compute_SI_SS_VASO_Mz_signal(time, T1_ref, Tr, Ti1, Ti2,
+                                           mode_nonblood=False)
 
     ax.cla()
     ax.plot(time, signal1, lw=2, color="blue")
     ax.plot(time, signal2, lw=2, color="red")
 
-    ax.set_title("SI-VASO")
+    ax.set_title("SI-SS-VASO")
     ax.set_xlabel("Time [s]")
     ax.set_ylabel(r"$M_z$")
     ax.set_xlim([0, max_time])
@@ -87,20 +94,27 @@ def plot_SI_VASO_Mz_signal(ax, max_time, T1_ref, T1, Tr, Ti):
     for x in event_180deg:
         ax.text(x, 0.02, r"$180\degree$ pulse", rotation=90, transform=trans)
 
-    event_90deg = np.arange(+Ti, max_time, 2*Tr)
-    for x in event_90deg:
+    event_90deg_1 = np.arange(Ti1, max_time, 2*Tr)
+    for x in event_90deg_1:
         ax.text(x, 0.02, r"$90\degree$ pulse", rotation=90, transform=trans)
-    ax.vlines(event_90deg, -1, 1, linestyle=':', color='gray', zorder=0)
+    ax.vlines(event_90deg_1, -1, 1, linestyle=':', color='gray', zorder=0)
+
+    event_90deg_2 = np.arange(Tr+Ti2, max_time, 2*Tr)
+    for x in event_90deg_2:
+        ax.text(x, 0.02, r"$90\degree$ pulse", rotation=90, transform=trans)
+    ax.vlines(event_90deg_2, -1, 1, linestyle=':', color='gray', zorder=0)
 
 
 def update(val):
     """Update plot data after each slider interaction."""
     T1 = sT1.val
     max_time = sTime.val
-    Ti = sTi.val
+    Ti1 = sTi1.val
+    Ti2 = sTi2.val
     Tr = sTr.val
 
-    plot_SI_VASO_Mz_signal(ax1, max_time, T1_ref=T1b, T1=T1, Tr=Tr, Ti=Ti)
+    plot_SI_SS_VASO_Mz_signal(ax1, max_time, T1_ref=T1b, T1=T1, Tr=Tr,
+                              Ti1=Ti1, Ti2=Ti2)
     fig1.canvas.draw_idle()
 
 
@@ -109,7 +123,8 @@ def update(val):
 # =============================================================================
 T1gm = 1.9
 T1b = 2.1  # steady state blood
-Ti = 1.18
+
+Ti1 = 1.45561
 Ti2 = 1.7
 Tr = 2.
 
@@ -119,8 +134,10 @@ time = np.linspace(0, max_time, 1001)
 # =============================================================================
 # Plotting
 # =============================================================================
+# Prepare figure
 fig1, (ax1) = plt.subplots(1, 1)
-plot_SI_VASO_Mz_signal(ax1, max_time, T1_ref=T1b, T1=T1gm, Tr=Tr, Ti=Ti)
+plot_SI_SS_VASO_Mz_signal(ax1, max_time, T1_ref=T1b, T1=T1gm, Tr=Tr,
+                          Ti1=Ti1, Ti2=Ti2)
 
 # -----------------------------------------------------------------------------
 # Sliders
@@ -131,17 +148,20 @@ axcolor = 'lightgoldenrodyellow'
 # [left, bottom, width, height]
 axT1 = plt.axes([0.15, 0.9, 0.70, 0.03], facecolor=axcolor)
 axTime = plt.axes([0.15, 0.85, 0.70, 0.03], facecolor=axcolor)
-axTi = plt.axes([0.15, 0.80, 0.70, 0.03], facecolor=axcolor)
-axTr = plt.axes([0.15, 0.75, 0.70, 0.03], facecolor=axcolor)
+axTi1 = plt.axes([0.15, 0.80, 0.70, 0.03], facecolor=axcolor)
+axTi2 = plt.axes([0.15, 0.75, 0.70, 0.03], facecolor=axcolor)
+axTr = plt.axes([0.15, 0.70, 0.70, 0.03], facecolor=axcolor)
 
 sT1 = Slider(axT1, r"$T_1$", 0, 6.0, valinit=T1gm, valstep=0.1)
 sTime = Slider(axTime, r"$Max. Time$", 1, 30, valinit=max_time, valstep=0.5)
-sTi = Slider(axTi, r"$Ti$", 0, 6.0, valinit=Ti, valstep=0.1)
+sTi1 = Slider(axTi1, r"$Ti_1$", 0, 6.0, valinit=Ti1, valstep=0.1)
+sTi2 = Slider(axTi2, r"$Ti_2$", 0, 6.0, valinit=Ti2, valstep=0.1)
 sTr = Slider(axTr, r"$Tr$", 0, 6.0, valinit=Tr, valstep=0.1)
 
 sT1.on_changed(update)
 sTime.on_changed(update)
-sTi.on_changed(update)
+sTi1.on_changed(update)
+sTi2.on_changed(update)
 sTr.on_changed(update)
 
 plt.show()
