@@ -128,7 +128,7 @@ idx = time < Tr+Tr+Tr+Tr+Tr+Tr
 signal1[idx] = stage9_gm(time[idx], T1gm, Ti)
 idx = time < Tr+Tr+Tr+Tr+Tr+Ti
 signal1[idx] = stage8_gm(time[idx], T1gm, Ti)
-idx = time < Tr+Tr+Ti+Tr+Tr
+idx = time < Tr+Tr+Tr+Tr+Ti
 signal1[idx] = stage7_gm(time[idx], T1gm, Ti2)
 idx = time < Tr+Tr+Tr+Tr
 signal1[idx] = stage6_gm(time[idx], T1gm, Ti2)
@@ -159,17 +159,120 @@ signal2[idx] = stage2_blood(time[idx], T1b, Ti2)
 idx = time < Ti2+Tr
 signal2[idx] = stage1_blood(time[idx], T1b)
 
+
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# Faruk's rework start from here
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+def Mz(time, M0_equi, M0_init, FA_rad, T1):
+    """Longitudinal magnetization."""
+    return M0_equi - (M0_equi - M0_init * np.cos(FA_rad)) * np.exp(-time/T1)
+
+
+# Prepare condition array
+cond = np.full(time.shape, 3)
+idx2 = time % (Tr*2) < (Ti2+Tr)  # Stages after 180 deg pulse
+idx1 = time % (Tr*2) < Ti  # Stages after the first 90 deg pulse
+cond[idx2] = 2
+cond[idx1] = 1
+
+# =============================================================================
+# Compute signal array
+# =============================================================================
+signal3 = np.zeros(time.shape)
+
+# Prepare initial parameters
+M0_equi = 1.  # This never changes
+M0_init = 1.
+for i, t in enumerate(time):
+    t %= 2*Tr
+
+    # -------------------------------------------------------------------------
+    # Handle first signal separately
+    # -------------------------------------------------------------------------
+    if i == 0:
+        signal3[i] = Mz(time=t, M0_equi=M0_equi, M0_init=M0_init,
+                        FA_rad=np.deg2rad(180), T1=T1gm)
+
+    # -------------------------------------------------------------------------
+    # After 180 degree pulse
+    # -------------------------------------------------------------------------
+    elif cond[i] == 1:
+        if cond[i] != cond[i-1]:  # Update M0 upon condition switch
+            M0_init = Mz(time=Tr-Ti2, M0_equi=M0_equi, M0_init=M0_init,
+                         FA_rad=np.deg2rad(90), T1=T1gm)
+        signal3[i] = Mz(time=t, M0_equi=M0_equi, M0_init=M0_init,
+                        FA_rad=np.deg2rad(180), T1=T1gm)
+
+    # -------------------------------------------------------------------------
+    # After the first 90 degree pulse
+    # -------------------------------------------------------------------------
+    elif cond[i] == 2:
+        signal3[i] = Mz(time=t-Ti, M0_equi=M0_equi, M0_init=M0_init,
+                        FA_rad=np.deg2rad(90), T1=T1gm)
+
+    # -------------------------------------------------------------------------
+    # After the second 90 degree pulse
+    # -------------------------------------------------------------------------
+    else:
+        signal3[i] = Mz(time=t-Tr-Ti2, M0_equi=M0_equi, M0_init=M0_init,
+                        FA_rad=np.deg2rad(90), T1=T1gm)
+
+# =============================================================================
+# Compute signal array
+# =============================================================================
+signal4 = np.zeros(time.shape)
+
+# Prepare initial parameters
+M0_equi = 1.  # This never changes
+M0_init = 1.
+for i, t in enumerate(time):
+    t %= 2*Tr
+
+    # -------------------------------------------------------------------------
+    # Handle first signal separately
+    # -------------------------------------------------------------------------
+    if i == 0:
+        signal4[i] = Mz(time=t, M0_equi=M0_equi, M0_init=M0_init,
+                        FA_rad=np.deg2rad(180), T1=T1b)
+
+    # -------------------------------------------------------------------------
+    # After 180 degree pulse
+    # -------------------------------------------------------------------------
+    elif cond[i] == 1:
+        signal4[i] = Mz(time=t, M0_equi=M0_equi, M0_init=M0_init,
+                        FA_rad=np.deg2rad(180), T1=T1b)
+
+    # -------------------------------------------------------------------------
+    # After the first 90 degree pulse
+    # -------------------------------------------------------------------------
+    elif cond[i] == 2:
+        signal4[i] = Mz(time=t-Ti, M0_equi=M0_equi, M0_init=M0_init,
+                        FA_rad=np.deg2rad(90), T1=T1b)
+
+    # -------------------------------------------------------------------------
+    # After the second 90 degree pulse
+    # -------------------------------------------------------------------------
+    else:
+        signal4[i] = Mz(time=t-Tr-Ti2, M0_equi=M0_equi, M0_init=M0_init,
+                        FA_rad=np.deg2rad(90), T1=T1b)
+
+
 # =============================================================================
 # Plotting
 # =============================================================================
 plt.plot(time, signal1, linewidth=2, color="blue")
 plt.plot(time, signal2, linewidth=2, color="red")
 
+plt.plot(time, signal3, linewidth=2, color="cyan")
+plt.plot(time, signal4, linewidth=2, color="orange")
+
 plt.title("SI-SS-VASO")
 plt.xlabel("Time [s]")
 plt.ylabel(r"$M_z$")
 plt.ylim([-1, 1])
 plt.grid(True)
-plt.legend(["Gray Matter", "Once Inverted Blood"])
+plt.legend(["R: Gray Matter", "R: Steady State Blood",
+            "F: Gray Matter", "F: Steady State Blood"])
+
 
 plt.show()
