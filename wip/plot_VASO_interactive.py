@@ -125,7 +125,7 @@ ax1.set_xlim([0, max_time])
 ax1.set_ylim([-1, 1])
 ax1.plot(time, signal1, lw=2, color="blue")
 ax1.plot(time, signal2, lw=2, color="red")
-ax1.legend(['Tissue X', 'Blood'])
+ax1.legend(['Tissue X', 'Blood'], loc="upper left")
 
 # -----------------------------------------------------------------------------
 # Reference lines
@@ -158,10 +158,10 @@ axTime = plt.axes([0.15, 0.85, 0.70, 0.03], facecolor=axcolor)
 axTi = plt.axes([0.15, 0.80, 0.70, 0.03], facecolor=axcolor)
 axTr = plt.axes([0.15, 0.75, 0.70, 0.03], facecolor=axcolor)
 
-sT1 = Slider(axT1, r"$T_1$", 0, 5.0, valinit=T1gm, valstep=0.1)
-sTime = Slider(axTime, r"$Max. Time$", 1, 20, valinit=max_time, valstep=1)
-sTi = Slider(axTi, r"$Ti$", 0, 5.0, valinit=Ti, valstep=0.1)
-sTr = Slider(axTr, r"$Tr$", 0, 5.0, valinit=Tr, valstep=0.1)
+sT1 = Slider(axT1, r"$T_1$", 0, 6.0, valinit=T1gm, valstep=0.1)
+sTime = Slider(axTime, r"$Max. Time$", 1, 30, valinit=max_time, valstep=1)
+sTi = Slider(axTi, r"$Ti$", 0, 6.0, valinit=Ti, valstep=0.1)
+sTr = Slider(axTr, r"$Tr$", 0, 6.0, valinit=Tr, valstep=0.1)
 
 sT1.on_changed(update)
 sTime.on_changed(update)
