@@ -61,17 +61,39 @@ def update(val):
     signal1 = compute_VASO_Mz_signal(time, T1gm, Tr, Ti)
     signal2 = compute_VASO_Mz_signal(time, T1b, Tr, Ti)
 
-    line1.set_xdata(time)
-    line2.set_xdata(time)
-    line1.set_ydata(signal1)
-    line2.set_ydata(signal2)
+    # -------------------------------------------------------------------------
+    # Clear axis and re-draw elements
+    # -------------------------------------------------------------------------
+    ax1.cla()
+    ax1.set_title("Original VASO")
+    ax1.set_xlabel("Time [s]")
+    ax1.set_ylabel(r"$M_z$")
     ax1.set_xlim([0, max_time])
+    ax1.set_ylim([-1, 1])
+    ax1.plot(time, signal1, lw=2, color="blue")
+    ax1.plot(time, signal2, lw=2, color="red")
+    ax1.legend(['Tissue X', 'Blood'], loc="upper left")
 
-    # start, end = ax1.get_xlim()
-    # print(start, end)
-    # ax1.xaxis.set_ticks(np.arange(start, end, 1))
+    # -------------------------------------------------------------------------
+    # Reference lines
+    # -------------------------------------------------------------------------
+    # Horizontal
+    ax1.hlines([0], 0, max_time, linestyle='solid',
+               color='lightgray', zorder=0)
 
-    fig.canvas.draw_idle()
+    # Vertical lines
+    event_180deg = np.arange(0, max_time, 2*Tr)
+    ax1.vlines(event_180deg, -1, 1, linestyle=':', color='gray', zorder=0)
+    trans = ax1.get_xaxis_transform()
+    for x in event_180deg:
+        ax1.text(x, 0.02, r"$180\degree$ pulse", rotation=90, transform=trans)
+
+    event_90deg = np.arange(+Ti, max_time, 2*Tr)
+    for x in event_90deg:
+        ax1.text(x, 0.02, r"$90\degree$ pulse", rotation=90, transform=trans)
+    ax1.vlines(event_90deg, -1, 1, linestyle=':', color='gray', zorder=0)
+
+    fig1.canvas.draw_idle()
 
 
 # =============================================================================
@@ -85,7 +107,7 @@ T1 = T1b  # für Tr= 3
 Ti = (np.log(2) - np.log(1 + np.exp(-2 * Tr / T1))) * T1
 
 max_time = 5 * Tr
-time = np.linspace(0, max_time, 501)
+time = np.linspace(0, max_time, 1001)
 
 signal1 = compute_VASO_Mz_signal(time, T1gm, Tr, Ti)
 signal2 = compute_VASO_Mz_signal(time, T1b, Tr, Ti)
@@ -94,22 +116,39 @@ signal2 = compute_VASO_Mz_signal(time, T1b, Tr, Ti)
 # Plotting
 # =============================================================================
 # Prepare figure
-fig, (ax1) = plt.subplots(1, 1)
+fig1, (ax1) = plt.subplots(1, 1)
 
 ax1.set_title("Original VASO")
 ax1.set_xlabel("Time [s]")
 ax1.set_ylabel(r"$M_z$")
 ax1.set_xlim([0, max_time])
 ax1.set_ylim([-1, 1])
-line1, = ax1.plot(time, signal1, lw=2, color="blue")
-line2, = ax1.plot(time, signal2, lw=2, color="red")
-
+ax1.plot(time, signal1, lw=2, color="blue")
+ax1.plot(time, signal2, lw=2, color="red")
 ax1.legend(['Tissue X', 'Blood'])
 
-plt.tight_layout()
+# -----------------------------------------------------------------------------
+# Reference lines
+# -----------------------------------------------------------------------------
+# Horizontal
+ax1.hlines([0], 0, max_time, linestyle='solid',
+           color='lightgray', zorder=0)
+
+# Vertical lines
+event_180deg = np.arange(0, max_time, 2*Tr)
+ax1.vlines(event_180deg, -1, 1, linestyle=':', color='gray', zorder=0)
+trans = ax1.get_xaxis_transform()
+for x in event_180deg:
+    ax1.text(x, 0.02, r"$180\degree$ pulse", rotation=90, transform=trans)
+
+event_90deg = np.arange(+Ti, max_time, 2*Tr)
+for x in event_90deg:
+    ax1.text(x, 0.02, r"$90\degree$ pulse", rotation=90, transform=trans)
+ax1.vlines(event_90deg, -1, 1, linestyle=':', color='gray', zorder=0)
 
 # -----------------------------------------------------------------------------
 # Sliders
+# -----------------------------------------------------------------------------
 fig2 = plt.figure()
 axcolor = 'lightgoldenrodyellow'
 
