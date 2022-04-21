@@ -1,4 +1,10 @@
-"""Reproduce Renzo's thesis Fig. 3.2 Panel A Page 47."""
+"""Interactive VASO longitudinal magnetization simulation.
+
+Reference
+---------
+- Renzo Huber's PhD Thesis Fig. 3.2 Panel A Page 47.
+
+"""
 
 import numpy as np
 import matplotlib.pyplot as plt
