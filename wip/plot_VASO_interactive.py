@@ -87,12 +87,6 @@ Ti = (np.log(2) - np.log(1 + np.exp(-2 * Tr / T1))) * T1
 max_time = 5 * Tr
 time = np.linspace(0, max_time, 501)
 
-
-# Prepare condition array
-cond = np.full(time.shape, 2)
-idx1 = time % (Tr*2) < Ti  # Stages after 180 deg pulse
-cond[idx1] = 1
-
 signal1 = compute_VASO_Mz_signal(time, T1gm, Tr, Ti)
 signal2 = compute_VASO_Mz_signal(time, T1b, Tr, Ti)
 
