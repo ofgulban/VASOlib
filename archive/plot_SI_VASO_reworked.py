@@ -138,7 +138,7 @@ def Mz(time, M0_equi, M0_init, FA_rad, T1):
 
 # Prepare condition array
 cond = np.full(time.shape, 2)
-idx1 = time % (Tr*2) < Ti  # Stages after 180 deg pulse
+idx1 = time % (Tr*2) <= Ti  # Stages after 180 deg pulse
 cond[idx1] = 1
 
 # =============================================================================
