@@ -1,4 +1,4 @@
-"""Interactive SI-SS-VASO longitudinal magnetization simulation.
+"""Interactive SS-SI-VASO longitudinal magnetization simulation.
 
 Reference
 ---------
@@ -18,7 +18,7 @@ def Mz(time, M0_equi, M0_init, FA_rad, T1):
     return M0_equi - (M0_equi - M0_init * np.cos(FA_rad)) * np.exp(-time/T1)
 
 
-def compute_SI_SS_VASO_Mz_signal(time, T1, Tr, Ti1, Ti2, mode_nonblood=False):
+def compute_SS_SI_VASO_Mz_signal(time, T1, Tr, Ti1, Ti2, mode_nonblood=False):
     """Compute VASO Mz signal."""
     signal = np.zeros(time.shape)
     M0_equi = 1.  # This never changes
@@ -63,12 +63,12 @@ def compute_SI_SS_VASO_Mz_signal(time, T1, Tr, Ti1, Ti2, mode_nonblood=False):
     return signal
 
 
-def plot_SI_SS_VASO_Mz_signal(ax, max_time, T1_ref, T1, Tr, Ti1, Ti2):
+def plot_SS_SI_VASO_Mz_signal(ax, max_time, T1_ref, T1, Tr, Ti1, Ti2):
     """Protocol to plot VASO longitudinal magnetization."""
     time = np.linspace(0, max_time, 1001)
-    signal1 = compute_SI_SS_VASO_Mz_signal(time, T1, Tr, Ti1, Ti2,
+    signal1 = compute_SS_SI_VASO_Mz_signal(time, T1, Tr, Ti1, Ti2,
                                            mode_nonblood=True)
-    signal2 = compute_SI_SS_VASO_Mz_signal(time, T1_ref, Tr, Ti1, Ti2,
+    signal2 = compute_SS_SI_VASO_Mz_signal(time, T1_ref, Tr, Ti1, Ti2,
                                            mode_nonblood=False)
 
     ax.cla()
@@ -113,7 +113,7 @@ def update(val):
     Ti2 = sTi2.val
     Tr = sTr.val
 
-    plot_SI_SS_VASO_Mz_signal(ax1, max_time, T1_ref=T1b, T1=T1, Tr=Tr,
+    plot_SS_SI_VASO_Mz_signal(ax1, max_time, T1_ref=T1b, T1=T1, Tr=Tr,
                               Ti1=Ti1, Ti2=Ti2)
     fig1.canvas.draw_idle()
 
@@ -136,7 +136,7 @@ time = np.linspace(0, max_time, 1001)
 # =============================================================================
 # Prepare figure
 fig1, (ax1) = plt.subplots(1, 1)
-plot_SI_SS_VASO_Mz_signal(ax1, max_time, T1_ref=T1b, T1=T1gm, Tr=Tr,
+plot_SS_SI_VASO_Mz_signal(ax1, max_time, T1_ref=T1b, T1=T1gm, Tr=Tr,
                           Ti1=Ti1, Ti2=Ti2)
 
 # -----------------------------------------------------------------------------
