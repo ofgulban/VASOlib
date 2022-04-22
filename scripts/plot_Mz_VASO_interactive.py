@@ -27,7 +27,7 @@ def compute_VASO_Mz_signal(time, T1, Tr, Ti):
 
     # Prepare condition array
     cond = np.full(time.shape, 2)
-    idx1 = time % (Tr*2) <= Ti  # Stages after 180 deg pulse
+    idx1 = time % (Tr*2) < Ti  # Stages after 180 deg pulse
     cond[idx1] = 1
 
     for i, t in enumerate(time):

@@ -26,8 +26,8 @@ def compute_SS_SI_VASO_Mz_signal(time, T1, Tr, Ti1, Ti2, mode_nonblood=False):
 
     # Prepare condition array
     cond = np.full(time.shape, 3)
-    idx2 = time % (Tr*2) <= (Ti2+Tr)  # Stages after 180 deg pulse
-    idx1 = time % (Tr*2) <= Ti1  # Stages after the first 90 deg pulse
+    idx2 = time % (Tr*2) < (Ti2+Tr)  # Stages after 180 deg pulse
+    idx1 = time % (Tr*2) < Ti1  # Stages after the first 90 deg pulse
     cond[idx2] = 2
     cond[idx1] = 1
     for i, t in enumerate(time):
