@@ -72,7 +72,6 @@ time_readouts = np.zeros(nr_timepoints)
 time_readouts[0::2] = time_readout1
 time_readouts[1::2] = time_readout2
 
-compute_SI_SS_VASO_Mz_signal(time_readouts-1, T1=1900, Tr=Tr, Ti1=Ti1, Ti2=Ti2, mode_nonblood=True)
 
 # Load nifti
 FILE = "/home/faruk/gdrive/proj-BOCO+/data/sub-01_T1_avg.nii.gz"
@@ -108,3 +107,20 @@ img = nb.Nifti1Image(data2, affine=np.eye(4))
 nb.save(img, OUTFILE)
 
 print("Finished.")
+
+
+def T1_from_SS_SI_VASO(x, y, Ti1, Ti2):
+    omega = (x * np.exp(-Ti1/1000) - (y * np.exp(-Ti2/1000))) / (x - y)
+    return np.log(omega)
+
+
+signals = compute_SI_SS_VASO_Mz_signal(time_readouts-1, T1=1900, Tr=Tr, Ti1=Ti1, Ti2=Ti2, mode_nonblood=True)
+nulled = signals[0::2]
+bold = signals[1::2]
+
+T1_from_SS_SI_VASO(bold, nulled, (Ti1+Tr-Ti2), (Ti2+Tr-Ti1))
+
+
+# From Renzo's ODIN script
+def Sig_fst_TI_fkt(T1, TR, TIeff=0, chi=0.6, alpha=70*220/270):
+return (1 - (1 + chi) * np.exp(-TIeff/T1) + chi * exp(-TR/T1) - cos(alpha/360. * 2.* 3.141596)* exp(-TR/T1) + cos (alpha/360. * 2.* 3.141596) * exp(-2.*TR/T1)  )/(  1. + chi * cos (alpha/360. * 2.* 3.141596)*cos(alpha/360. * 2.* 3.141596)* exp(-2*TR/T1)   )  ;
