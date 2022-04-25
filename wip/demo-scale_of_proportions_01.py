@@ -1,4 +1,12 @@
-"""Demonstrate scale of proportions problem of compositional data."""
+"""Demonstrate scale of proportions problem of compositional data.
+
+1. Simulate a single voxel, noiseless VASO signal (BOLD and Nulled).
+2. Impose percent signal change activity activity on BOCO (Nulled/BOLD).
+3. Demonstrate 'scale of proportions' problem of evolution of ratios which
+    results in incosistent statistical inferences.
+4. Demonstrate symmetrical and coherent inferences arise from compositional
+    treatment of the sampling space.
+"""
 
 import numpy as np
 import compoda.core as coda
