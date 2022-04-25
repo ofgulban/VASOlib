@@ -72,32 +72,39 @@ time_readouts = np.zeros(nr_timepoints)
 time_readouts[0::2] = time_readout1
 time_readouts[1::2] = time_readout2
 
+# =============================================================================
 # Compute VASO signal
+# =============================================================================
 T1gm = 2.1 * 1000
 T1blood = 1.9 * 1000
+
 data = compute_SI_SS_VASO_Mz_signal(
     time_readouts-1, T1=T1gm, Tr=Tr, Ti1=Ti1, Ti2=Ti2, mode_nonblood=True)
 
 bold = data[1]
-not_blood = data[2]  # aka nulled
-boco_rest = not_blood / bold
+nonblood = data[2]  # aka nulled
+boco_rest = nonblood / bold
 
 # Compute activity signal
-boco_act = boco_rest - (boco_rest * 0.05)
+boco_act = boco_rest - (boco_rest * 0.01)
 
 # Signal change
 delta1 = (boco_act - boco_rest) / boco_rest
+print("BOCO ~ (1-CBV) signal change: {:.2f}%".format(delta1*100))
 
 # -----------------------------------------------------------------------------
 # Let's have a look at CBV (1-BOCO)
+# -----------------------------------------------------------------------------
 counter_boco_rest = 1 - boco_rest
 counter_boco_act = 1 - boco_act
 
 # Signal change
 delta2 = (counter_boco_act - counter_boco_rest) / counter_boco_rest
+print("(1-BOCO) ~ CBV signal change: {:.2f}%".format(delta2*100))
 
 # -----------------------------------------------------------------------------
 # Let's consider the sampling space as simplex
+# -----------------------------------------------------------------------------
 comp_rest = coda.closure(np.vstack([boco_rest, 1-boco_rest]).T)
 clr_rest = coda.clr_transformation(comp_rest)
 
@@ -107,3 +114,5 @@ clr_act = coda.clr_transformation(comp_act)
 # Signal change
 delta3 = (clr_act[0, 0] - clr_rest[0, 0]) / clr_rest[0, 0]
 delta4 = (clr_act[0, 1] - clr_rest[0, 1]) / clr_rest[0, 1]
+print("COCO ~ (1-CBV) signal change: {:.2f}%".format(delta3*100))
+print("1-COCO ~ (CBV) signal change: {:.2f}%".format(delta4*100))
