@@ -99,7 +99,7 @@ nb.save(img, OUTFILE)
 # BOLD correction
 nulled = data[..., 0::2]
 bold = data[..., 1::2]
-data2 =  nulled / bold
+data2 = nulled / bold
 
 # data2[data2>5] = 5
 OUTFILE = "/home/faruk/gdrive/proj-BOCO+/data/test2.nii.gz"
@@ -109,17 +109,12 @@ nb.save(img, OUTFILE)
 print("Finished.")
 
 
-def T1_from_SS_SI_VASO(x, y, Ti1, Ti2):
-    omega = (x * np.exp(-Ti1/1000) - (y * np.exp(-Ti2/1000))) / (x - y)
-    return np.log(omega)
-
-
+# =============================================================================
 signals = compute_SI_SS_VASO_Mz_signal(time_readouts-1, T1=1900, Tr=Tr, Ti1=Ti1, Ti2=Ti2, mode_nonblood=True)
 nulled = signals[0::2]
 bold = signals[1::2]
 
-T1_from_SS_SI_VASO(bold, nulled, (Ti1+Tr-Ti2), (Ti2+Tr-Ti1))
-
+T1_from_SS_SI_VASO(bold, nulled, Ti1+Tr-Ti2, 2*Tr-Ti1-(Tr-Ti2))
 
 # From Renzo's ODIN script
 def Sig_fst_TI_fkt(T1, TR, TIeff=0, chi=0.6, alpha=70*220/270):
