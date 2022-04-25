@@ -1,15 +1,8 @@
-"""Demonstrate scale of proportions problem of compositional data.
-
-1. Simulate a single voxel, noiseless VASO signal (BOLD and Nulled).
-2. Impose percent signal change activity activity on BOCO (Nulled/BOLD).
-3. Demonstrate 'scale of proportions' problem of evolution of ratios which
-    results in incosistent statistical inferences.
-4. Demonstrate symmetrical and coherent inferences arise from compositional
-    treatment of the sampling space.
-"""
+"""Demonstrate scale of proportions of VASO over percent signal changes."""
 
 import numpy as np
 import compoda.core as coda
+import matplotlib.pyplot as plt
 
 
 # =============================================================================
@@ -74,7 +67,7 @@ Ti2 = 1.7 * 1000
 Tr = 2. * 1000
 max_time = 4 * Tr
 
-PSC = 0.05
+PSC = np.linspace(0.001, 0.05, 50)
 
 # Compute readout times
 time_readout1 = np.arange(Ti1, max_time, Tr*2)
@@ -88,9 +81,6 @@ time_readouts[1::2] = time_readout2
 # =============================================================================
 # Compute VASO signal
 # =============================================================================
-T1gm = 2.1 * 1000
-T1blood = 1.9 * 1000
-
 data = compute_SI_SS_VASO_Mz_signal(
     time_readouts-1, T1=T1gm, Tr=Tr, Ti1=Ti1, Ti2=Ti2, mode_nonblood=True)
 
@@ -98,34 +88,55 @@ bold = data[1]
 nonblood = data[2]  # aka nulled
 boco_rest = nonblood / bold
 
-# Compute activity signal
-boco_act = boco_rest - (boco_rest * PSC)
+results = np.zeros(PSC.shape + (4,))
+for i, p in enumerate(PSC):
+    # Compute activity signal
+    boco_act = boco_rest - (boco_rest * p)
 
-# Signal change
-delta1 = (boco_act - boco_rest) / boco_rest
-print("BOCO ~ (1-CBV) signal change: {:.2f}%".format(delta1*100))
+    # Signal change
+    delta1 = (boco_act - boco_rest) / boco_rest
 
-# -----------------------------------------------------------------------------
-# Let's have a look at CBV (1-BOCO)
-# -----------------------------------------------------------------------------
-counter_boco_rest = 1 - boco_rest
-counter_boco_act = 1 - boco_act
+    # -----------------------------------------------------------------------------
+    # Let's have a look at CBV (1-BOCO)
+    # -----------------------------------------------------------------------------
+    counter_boco_rest = 1 - boco_rest
+    counter_boco_act = 1 - boco_act
 
-# Signal change
-delta2 = (counter_boco_act - counter_boco_rest) / counter_boco_rest
-print("(1-BOCO) ~ CBV signal change: {:.2f}%".format(delta2*100))
+    # Signal change
+    delta2 = (counter_boco_act - counter_boco_rest) / counter_boco_rest
 
-# -----------------------------------------------------------------------------
-# Let's consider the sampling space as simplex
-# -----------------------------------------------------------------------------
-comp_rest = coda.closure(np.vstack([boco_rest, 1-boco_rest]).T)
-clr_rest = coda.clr_transformation(comp_rest)
+    # -----------------------------------------------------------------------------
+    # Let's consider the sampling space as simplex
+    # -----------------------------------------------------------------------------
+    comp_rest = coda.closure(np.vstack([boco_rest, 1-boco_rest]).T)
+    clr_rest = coda.clr_transformation(comp_rest)
 
-comp_act = coda.closure(np.vstack([boco_act, 1-boco_act]).T)
-clr_act = coda.clr_transformation(comp_act)
+    comp_act = coda.closure(np.vstack([boco_act, 1-boco_act]).T)
+    clr_act = coda.clr_transformation(comp_act)
 
-# Signal change
-delta3 = (clr_act[0, 0] - clr_rest[0, 0]) / clr_rest[0, 0]
-delta4 = (clr_act[0, 1] - clr_rest[0, 1]) / clr_rest[0, 1]
-print("COCO ~ (1-CBV) signal change: {:.2f}%".format(delta3*100))
-print("1-COCO ~ (CBV) signal change: {:.2f}%".format(delta4*100))
+    # Signal change
+    delta3 = (clr_act[0, 0] - clr_rest[0, 0]) / clr_rest[0, 0]
+    delta4 = (clr_act[0, 1] - clr_rest[0, 1]) / clr_rest[0, 1]
+
+    results[i, 0] = delta1
+    results[i, 1] = delta2
+    results[i, 2] = delta3
+    results[i, 3] = delta4
+
+
+fig, (ax1) = plt.subplots(1, 1)
+
+ax1.set_xlabel("PSC")
+ax1.set_ylabel("Signal change [%]")
+ax1.set_xlim([0, PSC[-1]])
+ax1.grid()
+
+ax1.plot(PSC, results[:, 0]*100, color="red")
+ax1.plot(PSC, results[:, 1]*100, color="lime")
+ax1.plot(PSC, results[:, 2]*100, color="blue")
+ax1.plot(PSC, results[:, 3]*100, color="cyan", linestyle='--')
+
+ax1.legend(['BOCO ~ (1-CBV)', '(1-BOCO) ~ CBV', 'COCO', '1-COCO'],
+           loc="lower left")
+
+plt.show()
