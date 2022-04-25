@@ -62,13 +62,31 @@ d_clr_change = d_clr[1, 0] - d_clr[0, 0]
 m_clr_change = m_clr[1, 0] - m_clr[0, 0]
 
 print("Change in rainy days in a year: [desert | mountain]")
-print("    {:.3f}% | {:.3f}%".format(d_clr_change, m_clr_change))
+print("    {:.3f} | {:.3f}".format(d_clr_change, m_clr_change))
+
+# -----------------------------------------------------------------------------
+# Let's compute the rainy days increment of ratios (percent change)
+# -----------------------------------------------------------------------------
+d_clr_increment = (d_clr[1, 0] - d_clr[0, 0]) / d_clr[0, 0] * 100  # %
+m_clr_increment = (m_clr[1, 0] - m_clr[0, 0]) / m_clr[0, 0] * 100  # %
+
+print("Increment in non-rainy days in a year: [desert | mountain]")
+print("    {:.3f}% | {:.3f}% \n".format(d_clr_increment, m_clr_increment))
+
+# -----------------------------------------------------------------------------
+# Let's compute the change in 'non-rainy days in a year'.
+# -----------------------------------------------------------------------------
+d_clr_change = d_clr[1, 1] - d_clr[0, 1]
+m_clr_change = m_clr[1, 1] - m_clr[0, 1]
+
+print("Change in rainy days in a year: [desert | mountain]")
+print("    {:.3f} | {:.3f}".format(d_clr_change, m_clr_change))
 
 # -----------------------------------------------------------------------------
 # Let's compute the non-rainy days increment of ratios (percent change)
 # -----------------------------------------------------------------------------
-d_clr_increment = (d_nonrainy[1] - d_nonrainy[0]) / d_nonrainy[0] * 100  # %
-m_clr_increment = (m_nonrainy[1] - m_nonrainy[0]) / m_nonrainy[0] * 100  # %
+d_clr_increment = (d_clr[1, 1] - d_clr[0, 1]) / d_clr[0, 1] * 100  # %
+m_clr_increment = (m_clr[1, 1] - m_clr[0, 1]) / m_clr[0, 1] * 100  # %
 
 print("Increment in non-rainy days in a year: [desert | mountain]")
-print("    {:.3f}% | {:.3f}% \n".format(d_increment, m_increment))
+print("    {:.3f}% | {:.3f}%".format(d_clr_increment, m_clr_increment))
