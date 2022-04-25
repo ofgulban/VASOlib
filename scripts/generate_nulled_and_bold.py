@@ -75,6 +75,11 @@ for i in np.linspace(1000, 3000, 21):
     signal2 = signal_nulled(time, S0, T2star, TI, i, TR, Ep)
     ax2.plot(time, signal2 / signal1, lw=0.5, color="gray")
 
+# # Iso-R1 lines
+# for i in np.linspace(1/1000, 1/3000, 21):
+#     signal2 = signal_nulled(time, S0, T2star, TI, 1/i, TR, Ep)
+#     ax2.plot(time, signal2 / signal1, lw=0.5, color="red")
+
 # -----------------------------------------------------------------------------
 # Sliders
 axcolor = 'lightgoldenrodyellow'
