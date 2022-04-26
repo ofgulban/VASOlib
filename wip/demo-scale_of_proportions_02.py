@@ -126,15 +126,15 @@ for i, p in enumerate(PSC):
 
 fig, (ax1) = plt.subplots(1, 1)
 
-ax1.set_xlabel("PSC")
+ax1.set_xlabel("Assumed PSC (based on BOCO) in activity [%].")
 ax1.set_ylabel("Signal change [%]")
-ax1.set_xlim([0, PSC[-1]])
+ax1.set_xlim([0, PSC[-1]*100])
 ax1.grid()
 
-ax1.plot(PSC, results[:, 0]*100, color="red")
-ax1.plot(PSC, results[:, 1]*100, color="lime")
-ax1.plot(PSC, results[:, 2]*100, color="blue")
-ax1.plot(PSC, results[:, 3]*100, color="cyan", linestyle='--')
+ax1.plot(PSC*100, results[:, 0]*100, color="red")
+ax1.plot(PSC*100, results[:, 1]*100, color="lime")
+ax1.plot(PSC*100, results[:, 2]*100, color="blue")
+ax1.plot(PSC*100, results[:, 3]*100, color="cyan", linestyle='--')
 
 ax1.legend(['BOCO ~ (1-CBV)', '(1-BOCO) ~ CBV', 'COCO', '1-COCO'],
            loc="lower left")
