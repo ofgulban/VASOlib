@@ -70,7 +70,7 @@ print("    {:.3f} | {:.3f}".format(d_clr_change, m_clr_change))
 d_clr_increment = (d_clr[1, 0] - d_clr[0, 0]) / d_clr[0, 0] * 100  # %
 m_clr_increment = (m_clr[1, 0] - m_clr[0, 0]) / m_clr[0, 0] * 100  # %
 
-print("Increment in non-rainy days in a year: [desert | mountain]")
+print("Increment in rainy days in a year: [desert | mountain]")
 print("    {:.3f}% | {:.3f}% \n".format(d_clr_increment, m_clr_increment))
 
 # -----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ print("    {:.3f}% | {:.3f}% \n".format(d_clr_increment, m_clr_increment))
 d_clr_change = d_clr[1, 1] - d_clr[0, 1]
 m_clr_change = m_clr[1, 1] - m_clr[0, 1]
 
-print("Change in rainy days in a year: [desert | mountain]")
+print("Change in non-rainy days in a year: [desert | mountain]")
 print("    {:.3f} | {:.3f}".format(d_clr_change, m_clr_change))
 
 # -----------------------------------------------------------------------------
