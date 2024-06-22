@@ -1,8 +1,15 @@
-"""Interactive SS-SI-VASO longitudinal magnetization simulation.
+"""Interactive SS-SI-VASO (Slice Selective Slab Inversion Vascular Space 
+Occupancy) longitudinal magnetization (M_z) simulation.
 
-Reference
+References
 ---------
-- Renzo Huber's PhD Thesis Fig. 3.2 Panel C Page 47.
+- [Renzo Huber's PhD Thesis Fig. 3.2 Panel C Page 47.] Mapping Human Brain 
+Activity by Functional Magnetic Resonance Imaging of Blood Volume. 2014. Der 
+Fakultät für Physik und Geowissenschaften der Universität Leipzig eingereichte
+
+- [Also see] Akbari, A., Bollmann, S., Ali, T.S., Barth, M., 2022. Modelling the 
+depth-dependent VASO and BOLD responses in human primary visual cortex. 
+Human Brain Mapping hbm.26094. https://doi.org/10.1002/hbm.26094
 
 """
 import numpy as np
